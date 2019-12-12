@@ -3,7 +3,7 @@
         <v-card
             class="mx-auto"
             max-width="500"
-        >
+        >   
         <v-card-text>
             <p>Pump : {{number}}</p>
         </v-card-text>

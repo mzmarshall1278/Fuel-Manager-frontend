@@ -1,13 +1,71 @@
 <template>
     <div class="container">
-        <pageTitle :pageTitle="`Pump : ${id} ${pump.oil}`"></pageTitle>
-    <v-card>
-        <!-- <v-form @submit.prevent = "makeSale">
-            <v-row class="mx-auto text-center">
-                
-            </v-row>
-        </v-form> -->
-        <v-btn @click="makeSale"></v-btn>
+        <pageTitle :pageTitle="`Pump : ${pump.number} ${pump.oil}`"></pageTitle>
+    <v-card class="pa-10">
+        
+        <v-form
+            ref="form"
+            v-model="valid"
+            lazy-validation
+            @submit.prevent="makeSale"
+            >
+
+            <v-radio-group v-model="session" :mandatory="true">
+                <p class="marshall--text">Session</p>
+                <p style="color:red" v-if="error">{{error}}</p>
+            <v-radio label="Morning" value="started"></v-radio>
+            <v-radio label="Night" value="finished"></v-radio>
+            </v-radio-group>
+
+            <div class="" v-if="session === 'started'">
+                <div class="title marshall--text">Morning Reading</div>
+                    <v-text-field
+                    v-model="startedA"
+                    type="number"
+                    label="Reading for Head A"
+                    required
+                    ></v-text-field>
+
+                    <v-text-field
+                    v-model="startedB"
+                    type="number"
+                    label="Reading for Head B"
+                    required
+                    ></v-text-field>
+            </div> 
+               
+            <div class=""  v-if="session === 'finished'">
+                <div class="title marshall--text">Night Reading</div>
+                 <v-text-field
+                v-model="finishedA"
+                type="number"
+                label="Reading for Head A"
+                required
+                ></v-text-field>
+
+                <v-text-field
+                v-model="finishedB"
+                type="number"
+                label="Reading for Head B"
+                required
+                ></v-text-field>
+
+            </div>
+               <v-text-field
+                    v-model="date"
+                    type="date"
+                    label="Date"
+                    required
+                    ></v-text-field>
+                <v-btn
+                :disabled="!valid"
+                color="marshall"
+                class="mr-4"
+                type="submit"
+                >
+                submit
+                </v-btn>
+            </v-form>
     </v-card>
     </div>
 </template>
@@ -15,7 +73,7 @@
 export default {
     data(){
         return {
-            startedA :'', finishedA:'', startedB:'', finishedB:'',
+            startedA :'', finishedA:'', startedB:'', finishedB:'', session: 'started', valid : true, error:"", date: ""
         }
     },
     computed:{
@@ -34,18 +92,45 @@ export default {
     },
     methods :{
         makeSale(){
+            if(!this.startedA && !this.startedB && !this.finishedA && !this.finishedB){
+                this.error = "sorry! you must enter at least One reading"
+                return
+            }
+            this.error = "";
             const sale = {
                 startedA: this.startedA,
                 startedB : this.startedB,
                 finishedA : this.finishedA,
                 finishedB : this.finishedB,
                 oil : this.pump.oil,
-                pumpId: this.pump.id,
+                pumpId: this.pump._id,
                 branchId : this.user.branchId,
-                litreAt : this.litreAt.price
+                litreAt : this.litreAt.price,
+                date : this.date
             }
             //vuex
-            console.log(sale)
+            //console.log(sale.date)
+            if(this.startedA || this.startedB){
+                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt.price, date : this.date}).then(res =>{
+                this.startedA ="";
+                this.startedB ="";
+                this.finisheddA ="";
+                this.finishedB ="";
+                this.date = ""
+                this.$router.push('/pumps')
+            })
+            }else{
+                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt.price, date : this.date}).then(res =>{
+                this.startedA ="";
+                this.startedB ="";
+                this.finisheddA ="";
+                this.finishedB ="";
+                this.date = ""
+                this.$router.push('/pumps')
+            })
+            }
+
+            
         }
     }
 }

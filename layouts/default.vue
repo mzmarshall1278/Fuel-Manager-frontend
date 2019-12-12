@@ -129,8 +129,8 @@ export default {
         },
         {
           icon: 'mdi-water',
-          title: 'reservoir',
-          to: '/reservoir'
+          title: 'stats',
+          to: '/stats'
         },
         {
           icon: 'mdi-account',

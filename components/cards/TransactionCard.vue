@@ -1,20 +1,33 @@
 <template>
-  <v-card
-    class="mx-auto my-2"
-    max-width="600px"
-  >
-    <v-card-text>
-      <p class="display-headline text--primary">
-        date : 12-12-12
-      </p>
-      <div>Pump : 01</div>
-      
-      <div class="text--primary">
-        <p>Started : 2000</p>
-        <p>Finished : 2001</p>
-        <p>litre at : 143</p>
-      </div>
-    </v-card-text>
-    
-  </v-card>
+            <v-flex xs12 sm6 md4 pa-1>
+                <v-card class="mx-auto"  max-width="500">
+                <v-card-title class="marshall white--text">
+                  Pump : {{pump.number}}</v-card-title>
+                <v-card-text class="marshall--text pt-2">
+                    <p>HeadA Started with : {{transaction.startedA}} litres</p>
+                    <p>HeadB Started with : {{transaction.startedB}} litres</p>
+                    <p>HeadA Finished with : {{transaction.finishedA}} litres</p>
+                    <p>HeadB Finished with : {{transaction.finishedB}} litres</p>
+                    <p>total liters sold :{{(transaction.startedA-transaction.finishedA) + (transaction.startedB - transaction.finishedB)}} litres</p>
+                    <p>total price : {{((transaction.startedA-transaction.finishedA) + (transaction.startedB - transaction.finishedB)) * transaction.litreAt}} NGN</p>
+                    <p>litre at : {{transaction.litreAt}}</p>
+                    <p>Pump type : {{transaction.oil}}</p>
+                </v-card-text>
+                </v-card>
+            </v-flex>
 </template>
+<script>
+export default {
+  props:['transaction'],
+  data(){
+    return {
+      
+    }
+  },
+  computed:{
+    pump(){
+      return this.$store.getters.getSinglePump(this.transaction.pumpId)
+    }
+  }
+}
+</script>

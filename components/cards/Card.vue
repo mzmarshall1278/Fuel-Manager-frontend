@@ -6,7 +6,7 @@
         >
          <v-card-text>
             <p class="title marshall--text text-center">
-                {{title}}: {{branchNumber}}
+                Branch: {{branchNumber}}
             </p>
             <p class="title marshall--text text-center" >
                 {{name}}
