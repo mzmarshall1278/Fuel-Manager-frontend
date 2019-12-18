@@ -1,11 +1,11 @@
 <template>
     <div class="container">
-        <p class="marshall--text headline">{{state}}</p>
-        <p class="marshall--text title"> Number of Branches : {{total}}</p>
+        <p class="marshall--text headline">{{state._id}}</p>
+        <p class="marshall--text title"> Number of Branches : {{state.total}}</p>
         
         <v-layout row wrap class="mx-auto">
                 
-                    <card v-for="(branch,id) in branches" :key="id" :id="branch.id" :branchNumber="branch.branchNumber" :name="branch.name" /> 
+                    <card v-for="(station,key) in state.stations" :key="key" :station="station" /> 
         </v-layout>
     </div>
 </template>

@@ -50,7 +50,6 @@
                 </v-btn>
             </v-form>
         </v-card>
-
     </div>
 </template>
 <script>
@@ -79,16 +78,14 @@ export default {
                 v => !!v || 'Date is required'
             ],
             items: [
-                'petrol',
+                'petrol',   
                 'desiel',
                 'kerosine',
             ],
         }
     },
     computed : {
-        branchId(){
-            return this.$store.state.user.branchId
-        }
+        
     },
     methods : {
         submit(){

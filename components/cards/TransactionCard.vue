@@ -1,5 +1,5 @@
 <template>
-            <v-flex xs12 sm6 md4 pa-1>
+            <v-flex xs12>
                 <v-card class="mx-auto"  max-width="500">
                 <v-card-title class="marshall white--text">
                   Pump : {{pump.number}}</v-card-title>

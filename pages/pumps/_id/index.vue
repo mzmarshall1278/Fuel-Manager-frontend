@@ -67,6 +67,7 @@
                 </v-btn>
             </v-form>
     </v-card>
+        
     </div>
 </template>
 <script>
@@ -87,7 +88,7 @@ export default {
             return this.$store.getters.getSinglePump(this.id)
         },
         litreAt (){
-            return this.$store.getters.litreAt(this.pump.oil);
+            return this.$store.getters.litreAt(this.pump.oil)
         }
     },
     methods :{
@@ -97,21 +98,23 @@ export default {
                 return
             }
             this.error = "";
-            const sale = {
-                startedA: this.startedA,
-                startedB : this.startedB,
-                finishedA : this.finishedA,
-                finishedB : this.finishedB,
-                oil : this.pump.oil,
-                pumpId: this.pump._id,
-                branchId : this.user.branchId,
-                litreAt : this.litreAt.price,
-                date : this.date
-            }
+            // const sale = {
+            //     startedA: this.startedA,
+            //     startedB : this.startedB,
+            //     finishedA : this.finishedA,
+            //     finishedB : this.finishedB,
+            //     oil : this.pump.oil,
+            //     pumpId: this.pump._id,
+            //     branchId : this.user.branchId,
+            //     litreAt : this.litreAt,
+            //     date : this.date
+            // }
+            
             //vuex
-            //console.log(sale.date)
+            
+            
             if(this.startedA || this.startedB){
-                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt.price, date : this.date}).then(res =>{
+                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt, date : this.date}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";
@@ -120,7 +123,7 @@ export default {
                 this.$router.push('/pumps')
             })
             }else{
-                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt.price, date : this.date}).then(res =>{
+                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt, date : this.date}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";

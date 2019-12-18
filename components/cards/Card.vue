@@ -6,10 +6,10 @@
         >
          <v-card-text>
             <p class="title marshall--text text-center">
-                Branch: {{branchNumber}}
+                Branch: {{station.branchNumber}}
             </p>
             <p class="title marshall--text text-center" >
-                {{name}}
+                {{station.name}}
             </p>
             </v-card-text>
             <v-card-actions>
@@ -26,10 +26,10 @@
 </template>
 <script>
 export default {
-    props :['name', 'branchNumber', 'id', 'title'],
+    props :['station'],
     methods : {
     loadThis(){
-        this.$router.push('/branches/'+this.id)
+        this.$router.push('/branches/'+this.station._id+'?state='+this.station.state)
     }
 }
 }

@@ -2,8 +2,7 @@
     <div class="container">
         <PageTitle pageTitle = "Branches"></PageTitle>
     <v-layout row wrap class="mx-auto">
-            <card v-for="(state, id) in states" :key="id" :state="state.name">
-            </card>
+
         <v-flex xs12 sm6 md4 pa-1>
         <v-card
             class="mx-auto"
@@ -12,7 +11,7 @@
             <v-card-actions>
             <v-btn large
                 text
-                color="marshall marshall"
+                color="marshall marshall"   
                 @click="loadThis"
             >
                 New Branch
@@ -20,6 +19,9 @@
             </v-card-actions>
         </v-card>
     </v-flex>
+            <card v-for="(state, id) in states" :key="id" :state="state">
+            </card>
+        
         </v-layout>
 
     </div>     
@@ -47,6 +49,9 @@ export default {
         loadThis (){
             this.$router.push('/branches/newBranch')
         }
+    },
+    mounted(){
+        return this.$store.dispatch('getAllBranches')
     }
 }
 </script>

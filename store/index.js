@@ -1,43 +1,26 @@
 import Vuex from 'vuex'
 import axios from 'axios'
+                            
 
 const createStore = () => {
     return new Vuex.Store({
         state :{
             user :{
-                id :'jhjfhgdgdg hxfhhc',
+                id :'jhjfhgdgdghxfhmnnvjkfdhcniuguioygreinruhmriugmhc',
                 type : 'manager',
                 token : '09yn87lgj688itgitds3yv4d6u5bi7fn6ogibfinrl6fu',
-                branchId : '5de125cb75366918af187637'
+                branchId : '5de125cb75366918af187637',
+                stationId : '5dde52f5bd009d27b54d3fb2'
             },
             litre :[],
-            branchesPreview :[
-                {id : '01', branchNumber :1, name :"Main Branch", state: "Kano"},
-                {id : '02', branchNumber :2, name :"BUK Branch", state: "Kano"},
-                {id : '03', branchNumber :3, name :"Main Branch", state: "Kaduna"},
-                {id : '04', branchNumber :4, name :"Malali Branch", state: "Kaduna"},
-                {id : '05', branchNumber :5, name :"Tarauni Branch", state: "Kano"},
-                {id : '06', branchNumber :6, name :"Main Branch", state: "Abuja"},
-            ],
-            fullBranches:[
-                {id : '01', branchNumber :1, name :"Main Branch", state: "Kano", address:"No 767 Zoo road, Kano", pumps : 24, manager: "Ahmad Abbati"},
-                {id : '02', branchNumber :2, name :"BUK Branch", state: "Kano", address:"No 97 Maiduguri road, Kano", pumps : 24, manager: "Ibrahim Isa"},
-                {id : '03', branchNumber :3, name :"Main Branch", state: "Kaduna", address:"No 54 Isa Kaita road, Kaduna", pumps : 18, manager: "Adam Mustapha"},
-                {id : '04', branchNumber :4, name :"Malali Branch", state: "Kaduna", address:"No 97 malali road, KAduna", pumps : 24, manager: "George Okowoicho"},
-                {id : '05', branchNumber :5, name :"Tarauni Branch", state: "Kano", address:"No 11 Maiduguri road, Kano", pumps : 12, manager: "Muslim Musa"},
-                {id : '06', branchNumber :6, name :"Main Branch", state: "Abuja", address:"No 65 Garki 2, Kalitingo street, Abuja", pumps : 24, manager: "Abdulhakeem Mustapha"},
-            ],
-            states :[
-                {id:'kn', name:"Kano"},
-                {id:'kd', name: "Kaduna"},
-                {id:'abj', name : 'Abuja'}
-            ],
+            branch :[],
+            station: [],
+            states :[],
+            reservoir:{},
             transactions : [],
             pumps: [],
             dailyTransactions:[],
-            deliveries : [
-                
-            ]
+            deliveries : []
         },
         mutations:{
             addPump(state, payload){
@@ -61,7 +44,7 @@ const createStore = () => {
                 state.dailyTransactions = payload
             },
             deliveries(state, payload){
-                state.deliveries.result.unshift(payload); 
+                //state.deliveries.result.unshift(payload); 
             },
             //initializes delivery records
             initDeliveries(state, payload){
@@ -84,9 +67,54 @@ const createStore = () => {
                     diesel : payload.diesel
                 }
                 state.litre = litre
+            },
+            initReservoir(state, payload){
+                const reservoir = {
+                    petrol : payload.petrol,
+                    kerosine : payload.kerosine,
+                    diesel : payload.diesel
+                }
+                state.reservoir = reservoir
+            },
+            setBranches(state, payload){
+                state.states = payload
+            },
+            addBranch(state, payload){
+                // no need to change the state. the redirection will refetch all branches from the db anyway
             }
         },
-        actions:{
+        actions : {
+          //****todo*****nuxtserver init shoul get the litre, reservoir, pumps and user*****//
+            signup({commit}, payload){
+                return axios.put(`http://localhost:9090/auth/signup`, payload).then(res => {
+
+                })
+            },
+            login({commit}, payload){
+                return axios.put(`http://localhost:9090/auth/login`, payload).then(res => {
+
+                })
+            },
+            // adds a branch
+            addBranch({state, commit}, payload){
+                return axios.post(`http://localhost:9090/branches`, {...payload,  stationId : state.user.stationId}).then(res=> {
+                    commit('addBranch', res.data.result)
+                })
+            },
+            //gets all branches
+            getAllBranches({state, commit}){
+                return axios.get(`http://localhost:9090/branches?stationId=${state.user.stationId}`).then(res=> {
+                    // console.log(res.data.result)
+                    commit('setBranches', res.data.result)
+                })
+            },
+
+            //gets the reservoir status
+            getReservoir({state, commit} ){
+                return axios.get(`http://localhost:9090/reservoir/${state.user.branchId}`).then(res=> {
+                    commit('initReservoir', res.data.result)
+                })
+            },
             //updates the litre
             updateLitre(context, payload){
                  
@@ -103,14 +131,14 @@ const createStore = () => {
                 })
             },
             //gets the logs of all deliveries
-            getDeliveryLogs({commit}, payload){
-                return axios.get(`http://localhost:9090/deliveries?branchId=${payload.branchId}`).then(result=> {
-                    commit('initDeliveries', result.data)
+            getDeliveryLogs({state, commit}){
+                return axios.get(`http://localhost:9090/deliveries/${state.user.branchId}`).then(result=> {
+                    commit('initDeliveries', result.data.result)
                 })
             },
             //adds a delivery record
-            addDelivery({commit}, payload){
-                return axios.post(`http://localhost:9090/deliveries`, payload).then(res => {
+            addDelivery({state, commit}, payload){
+                return axios.post(`http://localhost:9090/deliveries/${state.user.branchId}`, payload).then(res => {
                     console.log(res)
                     commit('deliveries', res.data.result)
                 })
@@ -134,6 +162,7 @@ const createStore = () => {
             },
             //makes a sale/transaction
             addSale({commit}, payload){
+                console.log(payload)
                 return axios.post('http://localhost:9090/sales', payload).then(res => {
                     console.log(res.data)
                 })
@@ -169,10 +198,11 @@ const createStore = () => {
                     })
                 }
             },
-            //gets a single Branch
+            //gets a state of a branch
             getSingleBranch(state){
-                return id => state.fullBranches.find(branch => branch.id === id)
+                return (name, id) => state.states.find(state => state._id === name).stations.find(station => station._id === id)
             },
+
             // gets all pumps
             getPumps(state){
                 return state.pumps
@@ -183,7 +213,9 @@ const createStore = () => {
             },
             //gets the price of a litre for a particular oil
             litreAt(state){
-                return oil => state.litre.find(litre => litre.oil === oil)
+                return (oil)=>{
+                    return state.litre[oil]
+                }
             },
             
         }
