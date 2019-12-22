@@ -122,12 +122,10 @@ const createStore = () => {
             initAuth(context, req){
                 let token;
                 let exp;
-      
                 if(req){
                     if(!req.headers.cookie){
                         return;
                     }
-                    console.log(req);
                     const jwtCookie = req.headers.cookie.split(';').find(c => c.trim().startsWith('jwt='));
                     const jwtExp = req.headers.cookie.split(';').find(c => c.trim().startsWith('tokenExpiration='));
                     if(!jwtCookie){
@@ -146,6 +144,7 @@ const createStore = () => {
                 
                 context.dispatch('setLogoutTimer', +exp - new Date().getTime());
                 context.commit('setToken', token);
+                console.log("auth checked")
             },
 
             // adds a branch

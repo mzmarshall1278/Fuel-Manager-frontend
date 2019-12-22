@@ -8,13 +8,7 @@
             lazy-validation
             @submit.prevent="submit"
             >
-                <v-text-field
-                v-model="name"
-                :rules="nameRules"
-                label="Full Name"
-                required
-                ></v-text-field>
-
+               
                 <v-text-field
                 v-model="email"
                 :rules="emailRules"
@@ -22,13 +16,13 @@
                 required
                 ></v-text-field>
 
-                <v-text-field
+                <!-- <v-text-field
                 v-model="number"
                 type="number"
                 :rules="numberRules"
                 label="Phone Number"
                 required
-                ></v-text-field>
+                ></v-text-field> -->
 
                 <v-text-field
                 v-model="password"
@@ -39,44 +33,16 @@
                 ></v-text-field>
 
 
-                <!-- <v-select
-                v-model="select"
-                :items="items"
-                :rules="[v => !!v || 'Item is required']"
-                label="Item"
-                required
-                ></v-select> -->
-
-                <!-- <v-checkbox
-                v-model="checkbox"
-                :rules="[v => !!v || 'You must agree to continue!']"
-                label="Do you agree?"
-                required
-                ></v-checkbox> -->
-
                 <v-btn
                 :disabled="!valid"
                 color="marshall"
-                class="mr-4"
+                class="mr-4 white--text"
                 type="submit"
                 >
                 Sign Up
                 </v-btn>
                 <nuxt-link to="/auth/login" class="marshall--text"> Already have account? </nuxt-link>
-                <!-- <v-btn
-                color="error"
-                class="mr-4"
-                @click="reset"
-                >
-                Reset Form
-                </v-btn>
-
-                <v-btn
-                color="warning"
-                @click="resetValidation"
-                >
-                Reset Validation
-                </v-btn> -->
+                
             </v-form>
         </v-card>
     </div>
@@ -86,11 +52,11 @@
   export default {
     data: () => ({
       valid: true,
-      name: '',
-      nameRules: [
-        v => !!v || 'Name is required',
-        v => (v && v.length >= 5) || 'Full Name must be More than 5 characters',
-      ],
+      // name: '',
+      // nameRules: [
+      //   v => !!v || 'Name is required',
+      //   v => (v && v.length >= 5) || 'Full Name must be More than 5 characters',
+      // ],
       email: '',
       emailRules: [
         v => !!v || 'E-mail is required',
@@ -101,19 +67,19 @@
         v => !!v || 'Password is required',
         v => (v && v.length >= 10 && v.length <= 32) || 'password must be between 10-32 characters',
       ],
-      number : '',
-      numberRules:[
-        v => !!v || 'Number is required',
-        v => (v && v.length >= 10) || 'Phone NUmber should be more than 10 characters',
-      ],
-      select: null,
-      items: [
-        'Item 1',
-        'Item 2',
-        'Item 3',
-        'Item 4',
-      ],
-      checkbox: false,
+      // number : '',
+      // numberRules:[
+      //   v => !!v || 'Number is required',
+      //   v => (v && v.length >= 10) || 'Phone NUmber should be more than 10 characters',
+      // ],
+      // select: null,
+      // items: [
+      //   'Item 1',
+      //   'Item 2',
+      //   'Item 3',
+      //   'Item 4',
+      // ],
+      // checkbox: false,
     }),
 
     methods: {
@@ -123,12 +89,14 @@
 
           const cred = {
               email: this.email,
-              name : this.name,
               password : this.password,
-              number : this.number
           }
-          console.log(cred);
-          this.$refs.form.reset()
+          
+          return this.$store.dispatch('signup', cred ).then(()=>{
+            this.$router.push('/auth/login')
+            this.$refs.form.reset()
+          })
+          
         }
       },
     //   

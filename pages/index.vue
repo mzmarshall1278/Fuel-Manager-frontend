@@ -10,9 +10,14 @@
 <script>
 import card from "~/components/cards/LitreCard";
 export default {
+  middleware:[
+    'checkAuth',
+    'Auth'
+    ],
   components: {
     card
   }
 }
 </script>
 
+  
