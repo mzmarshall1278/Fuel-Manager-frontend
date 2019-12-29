@@ -7,7 +7,7 @@
         <v-card
             class="mx-auto"
             max-width="500"
-        >
+        >   
             <v-card-actions>
             <v-btn large
                 text
@@ -17,6 +17,7 @@
                 New Branch
             </v-btn>
             </v-card-actions>
+          
         </v-card>
     </v-flex>
             <card v-for="(state, id) in states" :key="id" :state="state">
@@ -43,7 +44,7 @@ export default {
         states () {
             return this.$store.state.states
         },
-        
+    
     },
     methods : {
         loadThis (){

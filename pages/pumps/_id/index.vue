@@ -2,14 +2,15 @@
     <div class="container">
         <pageTitle :pageTitle="`Pump : ${pump.number} ${pump.oil}`"></pageTitle>
     <v-card class="pa-10">
-        
+        <ErrorTip :text="err" v-if="err" />
+        <OverLay :loading="loading" />
         <v-form
             ref="form"
             v-model="valid"
             lazy-validation
             @submit.prevent="makeSale"
             >
-
+            <p class="grey--text title"> Please Enter Zero "0" for a pump that is not functioning</p>
             <v-radio-group v-model="session" :mandatory="true">
                 <p class="marshall--text">Session</p>
                 <p style="color:red" v-if="error">{{error}}</p>
@@ -60,7 +61,7 @@
                 <v-btn
                 :disabled="!valid"
                 color="marshall"
-                class="mr-4"
+                class="mr-4 white--text"
                 type="submit"
                 >
                 submit
@@ -80,57 +81,53 @@ export default {
     computed:{
         id(){
             return this.$route.params.id
-        }, 
-        user(){
-            return this.$store.state.user
         },
         pump(){
             return this.$store.getters.getSinglePump(this.id)
         },
         litreAt (){
             return this.$store.getters.litreAt(this.pump.oil)
+        },
+        err(){
+            return this.$store.getters.error
+        },
+        loading(){
+            return this.$store.getters.loading
         }
+    },
+    mounted(){
+        return this.$store.dispatch('getLitreInfo' )
     },
     methods :{
         makeSale(){
             if(!this.startedA && !this.startedB && !this.finishedA && !this.finishedB){
-                this.error = "sorry! you must enter at least One reading"
+                this.error = "Please Fill all inputs. Enter '0' for a pump that is not functioning"
                 return
             }
             this.error = "";
-            // const sale = {
-            //     startedA: this.startedA,
-            //     startedB : this.startedB,
-            //     finishedA : this.finishedA,
-            //     finishedB : this.finishedB,
-            //     oil : this.pump.oil,
-            //     pumpId: this.pump._id,
-            //     branchId : this.user.branchId,
-            //     litreAt : this.litreAt,
-            //     date : this.date
-            // }
+           
             
             //vuex
             
             
             if(this.startedA || this.startedB){
-                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt, date : this.date}).then(res =>{
+                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";
                 this.finishedB ="";
                 this.date = ""
-                this.$router.push('/pumps')
-            })
+               if(!this.err) this.$router.push('/pumps')
+            }).catch(err => console.log(err))
             }else{
-                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, branchId : this.user.branchId, litreAt : this.litreAt, date : this.date}).then(res =>{
+                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";
                 this.finishedB ="";
                 this.date = ""
-                this.$router.push('/pumps')
-            })
+                if(!this.err)this.$router.push('/pumps')
+            }).catch(err => console.log(err))
             }
 
             

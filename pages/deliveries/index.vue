@@ -2,7 +2,7 @@
     <div class="container">
         <PageTitle pageTitle = "Deliveries" class="my-3"></PageTitle>
 
-        <v-btn large class="marshall--text pa-2 my-2" @click="goTo">Add new entry</v-btn>
+        <v-btn large class="marshall--text pa-2 my-2" @click="goTo" v-if="user.userType === 'branchManager'">Add new entry</v-btn>
         <v-card class="pa-2 mb-2" v-for="(day, key) in deliveries" :key="key">
             <v-card-title>Day : {{day._id}} - Deliveries : {{day.totalDeliveries}}</v-card-title>
 
@@ -29,6 +29,9 @@ export default {
         deliveries(){
             return this.$store.state.deliveries
         },
+        user(){
+            return this.$store.state.user
+        }
     },
     methods : {
         goTo(){

@@ -1,5 +1,11 @@
 <template>
     <div class="container">
+      <v-layout row v-if="error">
+        <v-flex xs12 sm6 offset-sm3 > 
+          <ErrorTip @dissmissed="onDismissed" :text="error"></ErrorTip>
+        </v-flex>
+      </v-layout>
+      <OverLay :loading="loading"/>
         <pageTitle pageTitle ="Create Account" class="my-2"></pageTitle>
         <v-card class="mx-auto pa-10">
             <v-form
@@ -81,7 +87,14 @@
       // ],
       // checkbox: false,
     }),
-
+    computed:{
+      error(){
+          return this.$store.getters.error
+        },
+        loading(){
+          return this.$store.getters.loading
+        } 
+    },
     methods: {
       submit () {
         if (this.$refs.form.validate()) {

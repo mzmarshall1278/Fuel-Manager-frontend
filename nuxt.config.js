@@ -31,6 +31,8 @@ export default {
   */
   plugins: [
     '~/plugins/PageTitle',
+    '~/plugins/error',
+    '~/plugins/overlay'
   ],
   /*
   ** Nuxt.js dev-modules

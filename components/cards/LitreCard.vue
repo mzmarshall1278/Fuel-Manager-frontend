@@ -1,6 +1,6 @@
 <template>
     <v-flex xs12> 
-      <v-card
+      <v-card 
     class="mx-auto my-2"
     max-width="600px"
   >
@@ -77,7 +77,6 @@ export default {
   methods : {
     changeLitre(){
       const data = {
-        branchId: this.branch,
         petrol : this.petrol ? this.petrol: this.litre.petrol,
         diesel : this.diesel ? this.diesel: this.litre.diesel,
         kerosine : this.kerosine ? this.kerosine: this.litre.kerosine,
@@ -93,7 +92,7 @@ export default {
   },
   
   mounted(){
-      return this.$store.dispatch('getLitreInfo', this.branch) 
+      return this.$store.dispatch('getLitreInfo', this.branch); 
   }
 }
 </script>

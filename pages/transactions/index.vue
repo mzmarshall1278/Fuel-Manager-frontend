@@ -25,7 +25,7 @@ export default {
         }
     },
     watch:{
-        page(value){
+        page(value){    
             this.changePage(value)
         }
     },

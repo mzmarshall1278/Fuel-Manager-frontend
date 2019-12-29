@@ -11,7 +11,7 @@
 </template>
 <script>
 import card from '~/components/cards/TransactionCard'
-export default {
+export default {    
     components:{
         card
     },
