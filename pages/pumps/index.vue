@@ -23,8 +23,7 @@
                     </v-card-actions>
 
                 <v-card>          
-
-                    
+      
                 </v-card>
                 </v-card>
         </v-flex>
@@ -49,6 +48,9 @@ export default {
         }
     },
     computed : {
+        branchId(){
+           return this.$route.query.branchId
+        },
         pumps(){
             return this.$store.getters.getPumps;
         },
@@ -61,12 +63,12 @@ export default {
     },
     methods : {
         addPump(){
-            this.$router.push('/pumps/newPump')
+            this.$router.push('/pumps/newPump?branchId='+this.branchId)
         },
     },
     
     mounted(){
-        return this.$store.dispatch('getPumps')
+        return this.$store.dispatch('getPumps', this.branchId)
     }
 }
 </script>

@@ -1,6 +1,8 @@
 <template>
     <div class="container">
         <PageTitle pageTitle = "New Delivery" class="my-3"></PageTitle>
+        <ErrorTip :text="err" v-if="err" />
+        <OverLay :loading="loading" />
         <v-card class="pa-10">
             <v-form @submit.prevent="submit" ref="form">
                 <v-text-field
@@ -85,7 +87,15 @@ export default {
         }
     },
     computed : {
-        
+        branchId(){
+            return this.$route.query.branchId;
+        },
+        err(){
+            return this.$store.getters.error
+        },
+        loading(){
+            return this.$store.getters.loading
+        }
     },
     methods : {
         submit(){
@@ -98,10 +108,10 @@ export default {
               date : this.date,
               branchId : this.branchId
           }
-          console.log(cred);
+          //console.log(cred);
 
           return this.$store.dispatch('addDelivery', cred).then(() => {
-              this.$router.push('/deliveries')
+              if(!this.err) this.$router.push('/deliveries')
               this.$refs.form.reset()
           }).catch(err => console.log(err))
           

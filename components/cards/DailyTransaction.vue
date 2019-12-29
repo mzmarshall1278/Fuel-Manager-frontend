@@ -18,15 +18,15 @@
 </template>
 <script>
 export default {
-    props:['data'],
-  datat(){
+    props:['data', 'branch'],
+  data(){
     return {
       
     }
   },
   methods:{
       loadThis(){
-          this.$router.push('/transactions/'+this.data._id)
+          this.$router.push('/transactions/'+this.data._id+"?branchId="+this.branch)
       }
   }
 }

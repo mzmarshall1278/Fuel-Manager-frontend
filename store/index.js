@@ -159,10 +159,10 @@ const createStore = () => {
       
                 if(req){
                     if(!req.headers.cookie){
-                        console.log("req, but no headers")
+                     //   console.log("req, but no headers")
                         return;
                     }
-                    console.log("req");
+                   // console.log("req");
                     const jwtCookie = req.headers.cookie.split(';').find(c => c.trim().startsWith('jwt='));
                     const jwtExp = req.headers.cookie.split(';').find(c => c.trim().startsWith('tokenExpiration='));
                     
@@ -178,7 +178,7 @@ const createStore = () => {
                     exp = jwtExp.split('=')[1];
                 }
                  else{
-                    console.log('no req')
+                   // console.log('no req')
                     userId = localStorage.getItem('userId');
                     userType = localStorage.getItem('userType');
                     branchId = localStorage.getItem('branchId');
@@ -235,14 +235,19 @@ const createStore = () => {
             },
             //updates the litre
             updateLitre(context, payload){
-                 
+                commit('clearError');
+                commit('setLoading', true);
                 return axios.put(`http://localhost:9090/litre/${context.state.user.branchId}`, payload).then(res => {
+                    commit('setLoading', false);
                     context.commit('updateLitre', res.data.result) 
-                })
+                }).catch(err => {
+                    commit('setLoading', false);
+                    commit('setError', "Something went wrong. litre Status could not be fetched");
+                })  
 
             },
             //gets the litre status
-            getLitreInfo({state, commit}){
+            getLitreInfo({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
                 return axios.get(`http://localhost:9090/litre/${state.user.branchId}`).then(res => {
@@ -255,60 +260,90 @@ const createStore = () => {
                 })
             },
             //gets the logs of all deliveries
-            getDeliveryLogs({state, commit}){
-                return axios.get(`http://localhost:9090/deliveries/${state.user.branchId}`).then(result=> {
-                    commit('initDeliveries', result.data.result)
+            getDeliveryLogs({state, commit}, payload){
+                commit('clearError');
+                commit('setLoading', true)
+                return axios.get(`http://localhost:9090/deliveries/${payload}`).then(res=> {
+                   // console.log(res.data)
+                    commit('setLoading', false)
+                    commit('initDeliveries', res.data.result);
+                }).catch( err => {
+                    commit('setLoading', false);
+                    commit('setError', 'Something went wrong. Your Delivery Logs couldn\'t be fetched');
                 })
             },
             //adds a delivery record
             addDelivery({state, commit}, payload){
-                return axios.post(`http://localhost:9090/deliveries/${state.user.branchId}`, payload).then(res => {
-                    console.log(res)
-                    commit('deliveries', res.data.result)
+                commit('clearError');
+                commit('setLoading', true)
+                return axios.post(`http://localhost:9090/deliveries/${payload.branchId}?stationId=${state.user.stationId}&state=${state.user.state}`, payload).then(res => {
+                   // console.log(res)
+                    commit('setLoading', false)
+                    // commit('deliveries', res.data.result)
+                }).catch( err => {
+                    commit('setLoading', false);
+                    commit('setError', 'Something went wrong. Your Delivery couldn\'t be Saved');
                 })
             },
 
             //gets the transaction details of a single day
-            getTransactionDetail({commit}, payload){
-                
+            getTransactionDetail({commit, dispatch}, payload){
+                commit('clearError');
+                commit('setLoading', true)
+                 dispatch('getPumps', payload.branch)
                 return axios.get(`http://localhost:9090/sales/${payload.branch}?date=${payload.date}`).then(res =>{
-                    //console.log(res)
+                    //console.log(payload)
+                    commit('setLoading', false)
                     commit('setDailyTransactions', res.data.result)
+                }).catch( err => {
+                    commit('setLoading', false);
+                    commit('setError', 'Something went wrong. Your Transactions couldn\'t be fetched');
                 })
             },
             //gets all sales snapshot
             getDailySaleDetail({commit},payload){
-                //
+                commit('clearError');
+                commit('setLoading', true)
                 return axios.get(`http://localhost:9090/sales?branchId=${payload.branch}&page=${payload.page}`).then(res=>{
                     //console.log(res.data);
+                    commit('setLoading', false)
                     commit('initTransactions', res.data)
+                }).catch( err => {
+                    commit('setLoading', false);
+                    commit('setError', 'Something went wrong. Your Transactions couldn\'t be fetched');
                 })
             },
             //makes a sale/transaction
             addSale({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
-                console.log(payload)
-                return axios.post('http://localhost:9090/sales', {...payload, branchId:state.user.branchId}).then(res => {
+                //console.log(payload)
+                return axios.post('http://localhost:9090/sales', payload).then(res => {
                     commit('setLoading', false);
-                    console.log(res.data)
+                   // console.log(res.data)
                 }).catch(err => {
                     commit('setLoading', false);
-                    commit('setError', "Sorry, This reading could not be saved. Try Again");
+                    commit('setError', "You have already Entered a sale on the same date. Move to the next pump");
                 })
             },
 
             //Updates the sale when night reading is taken
             updateSale({state, commit}, payload){
+                commit('clearError');
+                commit('setLoading', true);
                 return axios.put('http://localhost:9090/sales', {...payload, branchId:state.user.branchId}).then(res => {
-                    console.log(res.data)
+                    commit('setLoading', false);
+                    //console.log(res.data)
+                }).catch(err => {
+                    commit('setLoading', false);
+                    commit('setError', "You have already Entered a sale on the same date. Move to the next pump");
                 })
             },
             //adds a pump
             addPump({state, commit}, payload){
                 commit('setLoading',true);
                 commit('clearError')
-                return axios.post('http://localhost:9090/pumps', {...payload, branchId : state.user.branchId}).then(res => {
+                return axios.post('http://localhost:9090/pumps', payload).then(res => {
                     //console.log(res.data.result);
                 commit('addPump', res.data.result)
                 commit('setLoading', false)
@@ -319,10 +354,10 @@ const createStore = () => {
                 })
             },
             //gets all pumps
-            getPumps({state, commit}){
+            getPumps({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
-                return axios.get(`http://localhost:9090/pumps?branch=${state.user.branchId}`).then(res=> {
+                return axios.get(`http://localhost:9090/pumps?branch=${payload}`).then(res=> {
                     //console.log(res.data)
                     commit('setLoading' ,false)
                     commit('setPumps', res.data.pumps)

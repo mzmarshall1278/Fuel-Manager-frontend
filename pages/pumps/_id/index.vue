@@ -82,13 +82,16 @@ export default {
         id(){
             return this.$route.params.id
         },
+         branchId(){
+           return this.$route.query.branchId
+        },
         pump(){
             return this.$store.getters.getSinglePump(this.id)
         },
         litreAt (){
             return this.$store.getters.litreAt(this.pump.oil)
         },
-        err(){
+        err(){  
             return this.$store.getters.error
         },
         loading(){
@@ -111,7 +114,7 @@ export default {
             
             
             if(this.startedA || this.startedB){
-                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date}).then(res =>{
+                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date, branchId: this.branchId}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";
@@ -120,7 +123,7 @@ export default {
                if(!this.err) this.$router.push('/pumps')
             }).catch(err => console.log(err))
             }else{
-                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date}).then(res =>{
+                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date, branchId: this.branchId}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";

@@ -141,11 +141,11 @@ export default {
         }else if(this.user.userType === 'branchManager'){
           items = [
             {icon: 'mdi-home',  title: 'home', to: '/'},
-            {icon: 'mdi-gas-station',title: 'Pumps', to: '/pumps' },
-            {icon: 'mdi-tanker-truck', title: 'deliveries', to: '/deliveries'},
-            {icon: 'mdi-pencil-box', title: 'transactions', to: '/transactions'},
-            {icon: 'mdi-water', title: 'stats', to: '/stats'},
-            {icon: 'mdi-account',title: 'profile', to: '/profile' },
+            {icon: 'mdi-gas-station',title: 'Pumps', to: `/pumps?branchId=${this.user.branchId}` },
+            {icon: 'mdi-tanker-truck', title: 'deliveries', to: `/deliveries?branchId=${this.user.branchId}`},
+            {icon: 'mdi-pencil-box', title: 'transactions', to: `/transactions?branchId=${this.user.branchId}`},
+            {icon: 'mdi-water', title: 'stats', to: `/stats?branchId=${this.user.branchId}`},
+            {icon: 'mdi-account',title: 'profile', to:  `/profile?branchId=${this.user.branchId}` },
           ]
         }else if(this.user.userType === 'new'){
           items = [

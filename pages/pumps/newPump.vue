@@ -45,6 +45,9 @@ export default {
         }
     },
     computed: {
+         branchId(){
+           return this.$route.query.branchId
+        },
         pumps(){
             return this.$store.getters.getPumps;
         },
@@ -66,6 +69,7 @@ export default {
             const pump = {
                 number: this.pumps.length + 1,
                 oil : this.type,
+                branchId : this.branchId
             }
             if(!this.oil){
                 this.error = "You must specify the oil type"

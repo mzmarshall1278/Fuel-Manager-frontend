@@ -1,17 +1,19 @@
 <template>
     <div class="container">
         <pageTitle :pageTitle="`Detailed Sale on ${id}`"></pageTitle>
-
+        <PageTitle pageTitle = "Daily Transactions"></PageTitle>
+        <ErrorTip :text="err" v-if="err" />
+        <OverLay :loading="loading" />
         <v-card class="mt-3 pa-2">
-            <!-- {{transactions}} -->
-            <card v-for="transaction in transactions" :key="transaction._id" :transaction="transaction"/>
+            
+                <card v-for="transaction in transactions" :key="transaction._id" :transaction="transaction"/>
             
         </v-card>
     </div>
 </template>
 <script>
 import card from '~/components/cards/TransactionCard'
-export default {    
+export default {        
     components:{
         card
     },
@@ -25,10 +27,16 @@ export default {
            return this.$route.params.id
         },
         branch(){
-            return this.$store.state.user.branchId
+            return this.$route.query.branchId
         },
         transactions(){
             return this.$store.state.dailyTransactions
+        },
+        loading(){
+            return this.$store.getters.loading
+        },
+        err(){
+            return this.$store.getters.error
         }
     },
     mounted(){
@@ -37,9 +45,8 @@ export default {
             date : this.id,
             branch : this.branch
         }
-        this.$store.dispatch('getTransactionDetail', info)
+        this.$store.dispatch('getTransactionDetail', info);
     }
     
 }
 </script>
-

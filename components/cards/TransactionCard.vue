@@ -10,7 +10,7 @@
                     <p>HeadB Finished with : {{transaction.finishedB}} litres</p>
                     <p>total liters sold :{{(transaction.startedA-transaction.finishedA) + (transaction.startedB - transaction.finishedB)}} litres</p>
                     <p>total price : {{((transaction.startedA-transaction.finishedA) + (transaction.startedB - transaction.finishedB)) * transaction.litreAt}} NGN</p>
-                    <p>litre at : {{transaction.litreAt}}</p>
+                    <p>litre at : {{transaction.litreAt}} NGN</p>
                     <p>Pump type : {{transaction.oil}}</p>
                 </v-card-text>
                 </v-card>

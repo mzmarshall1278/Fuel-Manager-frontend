@@ -22,9 +22,14 @@
 <script>
 export default {
     props : ['number', 'pumpId'],
+    computed :{
+       branchId(){
+           return this.$store.state.user.branchId
+       }
+    },
     methods : {
         loadThis(){
-            this.$router.push('/pumps/'+this.pumpId)
+            this.$router.push('/pumps/'+this.pumpId+"?branchId="+this.branchId)
         }
     }
     

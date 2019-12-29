@@ -1,8 +1,10 @@
 <template>
     <div class="container">
         <PageTitle pageTitle = "Daily Transactions"></PageTitle>
+        <ErrorTip :text="err" v-if="err" />
+        <OverLay :loading="loading" />
         <v-layout row wrap class="mx-auto">
-            <card  v-for="trans in transactions" :key="trans._id" :data="trans" class="mb-2"/>    
+            <card  v-for="trans in transactions" :key="trans._id" :data="trans" :branch="branchId" class="mb-2"/>    
         </v-layout>
     
   <div class="text-center marshall--text mt-4">
@@ -29,15 +31,21 @@ export default {
             this.changePage(value)
         }
     },
-    computed: {
+    computed: { 
         branchId(){
-            return this.$store.state.user.branchId
+            return this.$route.query.branchId
         },
         transactions(){
             return this.$store.state.transactions.result
         },
         pages(){
             return this.$store.state.transactions.totalCount
+        },
+        loading(){
+            return this.$store.getters.loading
+        },
+        err(){
+            return this.$store.getters.error
         }
     },
     methods : {
