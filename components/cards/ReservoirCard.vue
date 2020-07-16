@@ -22,10 +22,13 @@ export default {
     computed:{
         reservoir(){
             return this.$store.state.reservoir
+        },
+        branchId(){
+            return this.$route.query.branchId
         }
     },
     mounted(){
-        return this.$store.dispatch('getReservoir')
+        return this.$store.dispatch('getReservoir', this.branchId)
     }
 }
 </script>

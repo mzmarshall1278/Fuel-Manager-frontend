@@ -76,7 +76,7 @@ export default {
                 return
             }
             return this.$store.dispatch('addPump', pump).then((res, err) => {
-                if(!this.err) this.$router.push('/pumps')
+                if(!this.err) this.$router.push('/pumps?branchId='+this.branchId)
                this.error = ""
             } ).catch(err => {
 

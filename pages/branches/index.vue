@@ -2,57 +2,63 @@
     <div class="container">
         <PageTitle pageTitle = "Branches"></PageTitle>
     <v-layout row wrap class="mx-auto">
-
-        <v-flex xs12 sm6 md4 pa-1>
-        <v-card
-            class="mx-auto"
-            max-width="500"
-        >   
-            <v-card-actions>
-            <v-btn large
-                text
-                color="marshall marshall"   
-                @click="loadThis"
-            >
-                New Branch
-            </v-btn>
-            </v-card-actions>
-          
-        </v-card>
-    </v-flex>
+        <ErrorTip :text="err" v-if="err" />
+        <OverLay :loading="loading" />
             <card v-for="(state, id) in states" :key="id" :state="state">
             </card>
-        
         </v-layout>
+    {{branches}}
+    <div class="text-center marshall--text mt-4">
+        <v-pagination
+        v-model="page"
+        :length="branches.pages"
+        :total-visible="7"
+        ></v-pagination>
+    </div>
 
     </div>     
-
-
 </template>
 <script>
 import card from '~/components/cards/StateCard'
 export default {
     components : {
         card:card
-    },
+    },  
     data(){
         return {
-            
+           page : 1 
         }
     },
-    computed : {
+    watch:{
+        page(value){
+            this.changePage(value)  
+        }
+    },
+    computed : {    
         states () {
             return this.$store.state.states
         },
-    
+        loading(){
+            return this.$store.getters.loading
+        },
+        branches(){
+            return this.$store.state.stateBranches
+        },
+        err(){
+            return this.$store.state.error
+        }
+
     },
     methods : {
         loadThis (){
             this.$router.push('/branches/newBranch')
-        }
+        },
+        changePage(value){
+            return this.$store.dispatch('getAllBranches', value);
+        },
     },
-    mounted(){
-        return this.$store.dispatch('getAllBranches')
-    }
+     mounted(){
+            this.changePage(1);
+        }
 }
 </script>

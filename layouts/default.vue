@@ -53,7 +53,7 @@
       <v-btn
       v-if="user"
         icon
-        @click.stop="" class="mr-2"
+        @click.stop="logout" class="mr-2"
       >
         <v-icon>mdi-account-key</v-icon> logout
       </v-btn>
@@ -118,7 +118,7 @@ export default {
     items(){
       let items = [
         {icon: 'mdi-home',  title: 'home', to: '/'},
-        {icon: 'mdi-home',  title: 'login', to: '/'},
+        {icon: 'mdi-home',  title: 'login', to: '/auth/login'},
       ];
       if(this.user.userType === 'owner'){
           items = [
@@ -132,10 +132,10 @@ export default {
         }else if(this.user.userType === 'stateManager') {
           items = [
             {icon: 'mdi-home',  title: 'home', to: '/'},
-            {icon: 'mdi-kodi', title: 'branches', to: `/branches/states/${this.user.state}` },
-            {icon: 'mdi-tanker-truck', title: 'deliveries', to: '/deliveries'},
-            {icon: 'mdi-pencil-box', title: 'transactions', to: '/transactions'},
-            {icon: 'mdi-water', title: 'stats', to: '/stats'},
+            {icon: 'mdi-kodi', title: 'branches', to: `/branches/states/${this.user.state}?stationId=${this.user.stationId}` },
+            {icon: 'mdi-tanker-truck', title: 'deliveries', to: `/deliveries/states/${this.user.state}?stationId=${this.user.stationId}`},
+            {icon: 'mdi-pencil-box', title: 'transactions', to: `/transactions/states/${this.user.state}?stationId=${this.user.stationId}`},
+            //{icon: 'mdi-water', title: 'stats', to: '/stats'},
             {icon: 'mdi-account',title: 'profile', to: '/profile' },
           ]
         }else if(this.user.userType === 'branchManager'){
@@ -157,13 +157,14 @@ export default {
       return items
     }
   },
-   middleware:[
-    'checkAuth',
-    'Auth'
-    ],
+   
   methods : {
     login(){
       this.$router.push('/auth/login');
+    },
+    logout(){
+      this.$store.dispatch('logout');
+      this.$router.push('/auth/login')
     }
   }
 }

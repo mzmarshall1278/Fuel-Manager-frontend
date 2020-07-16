@@ -1,11 +1,10 @@
 <template>
     <div class="container">
         <pageTitle :pageTitle="`Detailed Sale on ${id}`"></pageTitle>
-        <PageTitle pageTitle = "Daily Transactions"></PageTitle>
+        <!-- <PageTitle pageTitle = "Daily Transactions"></PageTitle> -->
         <ErrorTip :text="err" v-if="err" />
         <OverLay :loading="loading" />
         <v-card class="mt-3 pa-2">
-            
                 <card v-for="transaction in transactions" :key="transaction._id" :transaction="transaction"/>
             
         </v-card>
@@ -14,12 +13,14 @@
 <script>
 import card from '~/components/cards/TransactionCard'
 export default {        
+     middleware:[
+    'checkAuth',
+    'Auth'],
     components:{
         card
     },
     data(){
         return {
-
         }
     },
     computed :{

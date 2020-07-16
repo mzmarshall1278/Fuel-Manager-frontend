@@ -56,6 +56,7 @@
 </template>
 <script>
   export default {
+    layout: 'auth',
     data: () => ({
       valid: true,
       // name: '',
@@ -73,19 +74,6 @@
         v => !!v || 'Password is required',
         v => (v && v.length >= 10 && v.length <= 32) || 'password must be between 10-32 characters',
       ],
-      // number : '',
-      // numberRules:[
-      //   v => !!v || 'Number is required',
-      //   v => (v && v.length >= 10) || 'Phone NUmber should be more than 10 characters',
-      // ],
-      // select: null,
-      // items: [
-      //   'Item 1',
-      //   'Item 2',
-      //   'Item 3',
-      //   'Item 4',
-      // ],
-      // checkbox: false,
     }),
     computed:{
       error(){

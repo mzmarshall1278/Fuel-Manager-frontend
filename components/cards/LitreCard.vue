@@ -4,6 +4,8 @@
     class="mx-auto my-2"
     max-width="600px"
   >
+  <ErrorTip :text="err" v-if="err" />
+  <OverLay :loading="loading" />
     <v-card-title  class="display-1 marshall--text">
       Litre Prices
     </v-card-title>
@@ -60,6 +62,7 @@
 </template>
 <script>
 export default {
+ 
   data(){
     return {
       show : false,
@@ -68,10 +71,16 @@ export default {
   },
   computed:{
     branch(){
-      return this.$store.state.user.branchId
+      return this.$route.query.branchId
     },
     litre(){
       return this.$store.state.litre
+    },
+    loading(){
+      return this.$store.getters.loading
+    },
+    err(){
+      return this.$store.getters.error
     }
   },
   methods : {
@@ -80,13 +89,17 @@ export default {
         petrol : this.petrol ? this.petrol: this.litre.petrol,
         diesel : this.diesel ? this.diesel: this.litre.diesel,
         kerosine : this.kerosine ? this.kerosine: this.litre.kerosine,
+        branchId : this.branch
       }
       // reach out to the store
       return this.$store.dispatch('updateLitre', data).then( ()=> {
-        this.petrol = "";
+        
+       if(!this.err){
+         this.petrol = "";
         this.diesel = "";
         this.kerosine = "";
         this.show = false;
+       } 
       })
     }
   },

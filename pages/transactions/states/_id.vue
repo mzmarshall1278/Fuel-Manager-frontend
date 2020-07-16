@@ -1,28 +1,27 @@
 <template>
     <div class="container">
-        <PageTitle pageTitle = "Daily Transactions"></PageTitle>
+        <PageTitle pageTitle = "State Daily Transactions"></PageTitle>
         <ErrorTip :text="err" v-if="err" />
         <OverLay :loading="loading" />
         <v-layout row wrap class="mx-auto">
-            <card  v-for="trans in transactions" :key="trans._id" :data="trans" :branch="branchId" class="mb-2"/>    
+            <card  v-for="trans in transactions" :key="trans._id.date" :data="trans" :stationId="stationId" class="mb-2"/>    
         </v-layout>
-    
   <div class="text-center marshall--text mt-4">
     <v-pagination
       v-model="page"
-      :length="pages"   
+      :length="pages"
       :total-visible="7"
-    ></v-pagination>
+    ></v-pagination>    
   </div>
 
 
     </div>
 </template>
 <script>
-import card from '~/components/cards/DailyTransaction'
+import card from '~/components/cards/DailyStateTransaction'
 export default {
      middleware:[
-    'checkAuth',    
+    'checkAuth',
     'Auth'],
     components :{card},
     data(){
@@ -36,8 +35,11 @@ export default {
         }
     },
     computed: { 
-        branchId(){
-            return this.$route.query.branchId
+        stationId(){
+            return this.$route.query.stationId
+        },
+        state(){
+            return this.$route.params.id
         },
         transactions(){
             return this.$store.state.transactions.result
@@ -53,10 +55,11 @@ export default {
         }
     },
     methods : {
+        
         changePage(value){
-            return this.$store.dispatch('getDailySaleDetail', {branch : this.branchId, page:value}).then(() => {
-                return this.$store.dispatch('getPumps', this.branchId)
-                
+            const info = {state : this.state, stationId: this.stationId, page:value}
+            return this.$store.dispatch('getDailyStateSaleDetail', info).then(() => {
+                return this.$store.dispatch('getStateBranches', info )
             })
         }
     },

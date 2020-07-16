@@ -2,7 +2,7 @@
     <div class="container">
         <pageTitle :pageTitle="`Pump : ${pump.number} ${pump.oil}`"></pageTitle>
     <v-card class="pa-10">
-        <ErrorTip :text="err" v-if="err" />
+        <ErrorTip :text="err" v-if="err  && err != 'Something went wrong when fetching your litre'" />
         <OverLay :loading="loading" />
         <v-form
             ref="form"
@@ -73,6 +73,10 @@
 </template>
 <script>
 export default {
+    middleware:[
+    'checkAuth',
+    'Auth'
+    ],
     data(){
         return {
             startedA :'', finishedA:'', startedB:'', finishedB:'', session: 'started', valid : true, error:"", date: ""
@@ -96,10 +100,22 @@ export default {
         },
         loading(){
             return this.$store.getters.loading
+        },
+        user(){
+            return this.$store.state.user
+        }
+        
+    },
+    watch:{
+        err(val){
+            if(val === 'Something went wrong when fetching your litre'){
+                this.$router.push('/stats/newLitre?branchId='+this.branchId)
+         }
         }
     },
     mounted(){
-        return this.$store.dispatch('getLitreInfo' )
+        return this.$store.dispatch('getLitreInfo',this. branchId );
+        
     },
     methods :{
         makeSale(){
@@ -114,22 +130,22 @@ export default {
             
             
             if(this.startedA || this.startedB){
-                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date, branchId: this.branchId}).then(res =>{
+                return this.$store.dispatch('addSale', {startedA :this.startedA , startedB: this.startedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date, branchId: this.branchId, state: this.user.state, stationId : this.user.stationId}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";
                 this.finishedB ="";
                 this.date = ""
-               if(!this.err) this.$router.push('/pumps')
+               if(!this.err) this.$router.push('/pumps?branchId='+this.branchId);
             }).catch(err => console.log(err))
             }else{
-                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date, branchId: this.branchId}).then(res =>{
+                return this.$store.dispatch('updateSale',{ finishedA :this.finishedA , finishedB: this.finishedB, oil : this.pump.oil, pumpId : this.pump._id, litreAt : this.litreAt, date : this.date, branchId: this.branchId, state: this.user.state, stationId : this.user.stationId}).then(res =>{
                 this.startedA ="";
                 this.startedB ="";
                 this.finisheddA ="";
                 this.finishedB ="";
                 this.date = ""
-                if(!this.err)this.$router.push('/pumps')
+                if(!this.err)this.$router.push('/pumps?branchId='+this.branchId);
             }).catch(err => console.log(err))
             }
 

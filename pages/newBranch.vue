@@ -17,6 +17,8 @@
                 required
                 ></v-text-field>
 
+                
+
                 <v-select
                 v-model="state"
                 :items="items"
@@ -49,27 +51,15 @@ export default {
                 v => !!v || 'address is required',
                 v => (v && v.length >= 5) || 'address must be More than 10 characters',
             ], state : "",items: [
-                'Abia',
-                'Adamawa',
-                'Akwa-ibom',
-                'Aauchi',
-                'Bayelsa',
-                'Cross-river',
-                'Delta',
-                'Ekiti',
-                'Kano',
-                'Kaduna', 
-                'Abuja', 
-                'Lagos',
-                'Zamfara',
-                'Sokoto',
-                'Kebbi',
-                'Nassarawa',
-                'Jos',
-                'Jigawa',
-                'Katsina'   
+                'Abia' ,'Adamawa','Akwa Ibom','	Anambra', '	Bauchi', '	Bayelsa', '	Benue', '	Borno', '	Cross Rive', 'Delta', '	Ebonyi','Edo', 'Ekiti', 'Enugu', 'Gombe', 'Imo',, 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nassarawa', 'Niger', 'Ogun', 'Ondo',, 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara',
+                
             ],
         }
+    },
+    computed :{
+       stationId(){
+           return this.$rout.query.stationId
+       }
     },
     methods :{
         addBranch(){
@@ -77,6 +67,7 @@ export default {
                 name : this.name,
                 address : this.address,
                 state : this.state,
+                station : this.stationId
             };
             //vuex
             this.$store.dispatch('addBranch', branch).then(() =>{

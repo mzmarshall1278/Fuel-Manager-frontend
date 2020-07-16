@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
 import axios from 'axios'
 import Cookie from 'js-cookie'
+//import nigeria from '~/data/nigeria'
 
 const createStore = () => {
     return new Vuex.Store({
@@ -19,6 +20,8 @@ const createStore = () => {
             deliveries : [],
             error : null,
             loading: false,
+            oneBranch:'',
+           // nigeria : nigeria
         },
         mutations:{
             setLoading(state, payload){
@@ -103,17 +106,74 @@ const createStore = () => {
             }
         },
         actions : {
-            //for invalidating the token
-            setLogoutTimer({commit}, duration){
-                setTimeout(() => {
-                    commit('clearToken')
-                },duration)
+            setReservoir(context, payload){
+                context.commit('clearError');
+                context.commit('setLoading', true);
+                return axios.post(`http://localhost:9090/reservoir`, payload, {
+                    headers:{
+                        Authorization: `Bearer ${context.state.token}`
+                    }
+                }).then(res => {
+                    //console.log(res.data.result)
+                    context.commit('setLoading', false);
+                    context.commit('initReservoir', res.data.result); 
+                }).catch(err => {
+                    context.commit('setLoading', false);
+                    //console.log(err);
+                    context.commit('setError', err.response.data.message);
+
+                });
+            },
+            setLitre(context, payload){
+                context.commit('clearError');
+                context.commit('setLoading', true);
+                return axios.post(`http://localhost:9090/litre`, payload, {
+                    headers:{
+                        Authorization: `Bearer ${context.state.token}`
+                    }
+                }).then(res => {
+                    //console.log(res.data)
+                    context.commit('setLoading', false);
+                    context.commit('updateLitre', res.data.result); 
+                }).catch(err => {
+                    context.commit('setLoading', false);
+                    //console.log(err);
+                    context.commit('setError', err.response.data.message);
+
+                });
+            },
+            logout(context){
+                context.commit('clearToken');
+                Cookie.remove('jwt');
+                Cookie.remove('userId');
+                Cookie.remove('branchId');
+                Cookie.remove('stationId');
+                Cookie.remove('userType');
+                Cookie.remove('state');
+                Cookie.remove('tokenExpiration');
+                if(process.client){
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('branchId');
+                    localStorage.removeItem('stationId');
+                    localStorage.removeItem('userType');
+                    localStorage.removeItem('state');
+                    localStorage.removeItem('tokenExpiration');
+                }
+                context.user = "";
+
             },
           //****todo*****nuxtserver init shoul get the litre, reservoir, pumps and user*****//
-            signup({commit}, payload){
+            signup(context, payload){
+                context.commit('clearError');
+                context.commit('setLoading', true);
                 return axios.put(`http://localhost:9090/auth/signup`, payload).then(res => {
-                    console.log(res.data) 
-                })
+                    //console.log(res.data) 
+                    context.commit('setLoading', false);
+                }).catch(err => {
+                    context.commit('setLoading', false);
+                    context.commit('setError', err.response.data.message);
+                });
             },
             login(context, payload){
                 context.commit('clearError');
@@ -142,7 +202,7 @@ const createStore = () => {
                 }).catch(err => {
                     context.commit('setLoading', false);
                     console.log(err);
-                    context.commit('setError', "The information you entered was not correct");
+                    context.commit('setError', err.response.data.message);
 
                 });
             },
@@ -187,62 +247,92 @@ const createStore = () => {
                     token = localStorage.getItem('token');
                     exp = localStorage.getItem('tokenExpiration')
                 }
-                
+                //console.log(new Date().getTime(), ' ', +exp)
                 if(new Date().getTime() > +exp || !token){
-                    
-                    context.commit('clearToken');
+                    context.dispatch('logout');
                    return; 
                }
                 context.commit('setUser', {userId, branchId, stationId, state, userType});
                 context.commit('setToken', token);
             },
 
+
             // adds a branch
             addBranch({state, commit}, payload){
-                return axios.post(`http://localhost:9090/branches`, {...payload,  stationId : state.user.stationId}).then(res=> {
-                    commit('addBranch', res.data.result)
-                })
-            },
-            //gets all branches
-            getAllBranches({state, commit}){
-                return axios.get(`http://localhost:9090/branches?stationId=${state.user.stationId}`, {
+                return axios.post(`http://localhost:9090/branches`, {...payload,  stationId : state.user.stationId}, {
                     headers:{
                         Authorization: `Bearer ${state.token}`
                     }
                 }).then(res=> {
+                    commit('addBranch', res.data.result)
+                })  
+            },
+            //gets all branches
+            getAllBranches({state, commit}, payload){
+                commit('setLoading', true);
+                commit('clearError');
+                return axios.get(`http://localhost:9090/branches?stationId=${state.user.stationId}&page=${payload}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res=> {
+                    commit('setLoading', false);
                     // console.log(res.data.result)
                     commit('setBranches', res.data.result)
+                }).catch(err => {
+                    commit('setError',err.response.data.message);
+                    commit('setLoading', false);
                 })
             },
             getStateBranches(context, payload){
                 context.commit('setLoading', true);
                 context.commit('clearError')
-                return axios.get(`http://localhost:9090/branches/state/${context.state.user.stationId}?page=${payload.page}&state=${payload.state}`).then(res => {
+                return axios.get(`http://localhost:9090/branches/state/${payload.state}?page=${payload.page}&stationId=${payload.stationId}`, {
+                    headers:{
+                        Authorization: `Bearer ${context.state.token}`
+                    }
+                }).then(res => {
                     context.commit('setStateBranches', res.data);
                     context.commit('setLoading', false);
                 }).catch(err => {
-                    console.log(err);
+                   // console.log(err);
                     context.commit('setLoading', false);
-                    context.commit('setError', "Your Branches Could Not Be Fetched")
+                    context.commit('setError', err.response.data.message)
                 });
             },
 
             //gets the reservoir status
-            getReservoir({state, commit} ){
-                return axios.get(`http://localhost:9090/reservoir/${state.user.branchId}`).then(res=> {
-                    commit('initReservoir', res.data.result)
+            getReservoir({state, commit}, payload ){
+                commit('setLoading', true);
+                commit('clearError');
+                return axios.get(`http://localhost:9090/reservoir/${payload}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res=> {
+                    commit('setLoading', false);
+                    //console.log(res.data)
+                    commit('initReservoir', res.data.result);
+                }).catch(err => {
+                    commit('setLoading', false);
+                   // console.log(err)
+                    commit('setError', err.response.data.message);
                 })
             },
             //updates the litre
             updateLitre(context, payload){
-                commit('clearError');
-                commit('setLoading', true);
-                return axios.put(`http://localhost:9090/litre/${context.state.user.branchId}`, payload).then(res => {
-                    commit('setLoading', false);
-                    context.commit('updateLitre', res.data.result) 
+                context.commit('clearError');
+                context.commit('setLoading', true);
+                return axios.put(`http://localhost:9090/litre/${payload.branchId}`, payload, {
+                    headers:{
+                        Authorization: `Bearer ${context.state.token}`
+                    }
+                }).then(res => {
+                    context.commit('setLoading', false);
+                    context.commit('updateLitre', res.data.result); 
                 }).catch(err => {
-                    commit('setLoading', false);
-                    commit('setError', "Something went wrong. litre Status could not be fetched");
+                    context.commit('setLoading', false);
+                    context.commit('setError', err.response.data.message);
                 })  
 
             },
@@ -250,80 +340,149 @@ const createStore = () => {
             getLitreInfo({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
-                return axios.get(`http://localhost:9090/litre/${state.user.branchId}`).then(res => {
+                return axios.get(`http://localhost:9090/litre/${payload}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res => {
                     // console.log(res.data.litre)
                     commit('setLoading', false);
                     commit('initLiterValues', res.data.litre)
                 }).catch(err => {
                     commit('setLoading', false);
-                    commit('setError', "Something went wrong. litre Status could not be fetched");
+                    commit('setError', err.response.data.message);
                 })
             },
             //gets the logs of all deliveries
             getDeliveryLogs({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true)
-                return axios.get(`http://localhost:9090/deliveries/${payload}`).then(res=> {
+                return axios.get(`http://localhost:9090/deliveries/${payload.branchId}?page=${payload.page}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res=> {
                    // console.log(res.data)
                     commit('setLoading', false)
-                    commit('initDeliveries', res.data.result);
+                    commit('initDeliveries', res.data);
                 }).catch( err => {
                     commit('setLoading', false);
-                    commit('setError', 'Something went wrong. Your Delivery Logs couldn\'t be fetched');
+                    commit('setError', err.response.data.message);
                 })
             },
             //adds a delivery record
             addDelivery({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true)
-                return axios.post(`http://localhost:9090/deliveries/${payload.branchId}?stationId=${state.user.stationId}&state=${state.user.state}`, payload).then(res => {
+                return axios.post(`http://localhost:9090/deliveries/${payload.branchId}?stationId=${state.user.stationId}&state=${state.user.state}`, payload, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res => {
                    // console.log(res)
                     commit('setLoading', false)
                     // commit('deliveries', res.data.result)
                 }).catch( err => {
                     commit('setLoading', false);
-                    commit('setError', 'Something went wrong. Your Delivery couldn\'t be Saved');
+                    commit('setError', err.response.data.message);
                 })
             },
 
             //gets the transaction details of a single day
-            getTransactionDetail({commit, dispatch}, payload){
+            getTransactionDetail({state, commit, dispatch}, payload){
                 commit('clearError');
                 commit('setLoading', true)
-                 dispatch('getPumps', payload.branch)
-                return axios.get(`http://localhost:9090/sales/${payload.branch}?date=${payload.date}`).then(res =>{
+                //console.log(payload.branch)
+                        return axios.get(`http://localhost:9090/sales/${payload.branch}?date=${payload.date}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+
+                    }).then(res =>{
                     //console.log(payload)
                     commit('setLoading', false)
                     commit('setDailyTransactions', res.data.result)
                 }).catch( err => {
                     commit('setLoading', false);
-                    commit('setError', 'Something went wrong. Your Transactions couldn\'t be fetched');
+                    commit('setError', err.response.data.message);
                 })
             },
-            //gets all sales snapshot
-            getDailySaleDetail({commit},payload){
+
+            //gets the transaction details of a single day for the state
+            getStateTransactionDetail({state, commit, dispatch}, payload){
                 commit('clearError');
                 commit('setLoading', true)
-                return axios.get(`http://localhost:9090/sales?branchId=${payload.branch}&page=${payload.page}`).then(res=>{
+              //      dispatch('getStateBranches', {state:payload.state, stationId:payload.stationId, page:payload.page}).then(result => {
+                    //console.log(payload)
+                return axios.get(`http://localhost:9090/sales/state/details/${payload.state}?page=${payload.page}&stationId=${payload.stationId}&date=${payload.date}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`  
+                    }
+               // })
+                }).then(res =>{
+                    //console.log(res.data.result)
+                    commit('setLoading', false)
+                    commit('setDailyTransactions', res.data.result)
+                }).catch( err => {
+                    commit('setLoading', false);
+                    commit('setError', err.response.data.message);
+                })
+            },
+
+
+            //gets all state sales snapshot
+            getDailyStateSaleDetail({state, commit, dispatch},payload){
+                commit('clearError');
+                commit('setLoading', true)
+
+                return axios.get(`http://localhost:9090/sales/state/${payload.state}?stationId=${payload.stationId}&page=${payload.page}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res=>{
                     //console.log(res.data);
                     commit('setLoading', false)
                     commit('initTransactions', res.data)
                 }).catch( err => {
                     commit('setLoading', false);
-                    commit('setError', 'Something went wrong. Your Transactions couldn\'t be fetched');
+                    commit('setError', err.response.data.message);
                 })
             },
+
+            //gets all sales snapshot
+            getDailySaleDetail({state, commit},payload){
+                commit('clearError');
+                commit('setLoading', true);
+
+                return axios.get(`http://localhost:9090/sales?branchId=${payload.branch}&page=${payload.page}`, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res=>{
+                    //console.log(res.data);
+                    commit('setLoading', false)
+                    commit('initTransactions', res.data)
+                }).catch( err => {
+                    commit('setLoading', false);
+                    commit('setError', err.response.data.message);
+                })
+            },
+
             //makes a sale/transaction
             addSale({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
                 //console.log(payload)
-                return axios.post('http://localhost:9090/sales', payload).then(res => {
+                return axios.post('http://localhost:9090/sales', payload, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res => {
                     commit('setLoading', false);
                    // console.log(res.data)
                 }).catch(err => {
                     commit('setLoading', false);
-                    commit('setError', "You have already Entered a sale on the same date. Move to the next pump");
+                    commit('setError', err.response.data.message);
                 })
             },
 
@@ -331,39 +490,51 @@ const createStore = () => {
             updateSale({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
-                return axios.put('http://localhost:9090/sales', {...payload, branchId:state.user.branchId}).then(res => {
+                return axios.put('http://localhost:9090/sales', {...payload, branchId:state.user.branchId}, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res => {
                     commit('setLoading', false);
                     //console.log(res.data)
                 }).catch(err => {
                     commit('setLoading', false);
-                    commit('setError', "You have already Entered a sale on the same date. Move to the next pump");
+                    commit('setError', err.response.data.message);
                 })
             },
             //adds a pump
             addPump({state, commit}, payload){
                 commit('setLoading',true);
                 commit('clearError')
-                return axios.post('http://localhost:9090/pumps', payload).then(res => {
+                return axios.post('http://localhost:9090/pumps', payload, {
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res => {
                     //console.log(res.data.result);
                 commit('addPump', res.data.result)
                 commit('setLoading', false)
                 //console.log(res.data.result);
                 }).catch(err => {
                     commit('setLoading', false)
-                    commit('setError', "Sorry, this Pump could not be added. please try again")
+                    commit('setError', err.response.data.message)
                 })
             },
             //gets all pumps
             getPumps({state, commit}, payload){
                 commit('clearError');
                 commit('setLoading', true);
-                return axios.get(`http://localhost:9090/pumps?branch=${payload}`).then(res=> {
+                return axios.get(`http://localhost:9090/pumps?branch=${payload}`,{
+                    headers:{
+                        Authorization: `Bearer ${state.token}`
+                    }
+                }).then(res=> {
                     //console.log(res.data)
                     commit('setLoading' ,false)
                     commit('setPumps', res.data.pumps)
                 }).catch(err => {
                     commit('setLoading', false)
-                    commit('setError', "Sorry, Pumps could not be fetched. try again")
+                    commit('setError', err.response.data.message)
                 })  
             }
         },
@@ -411,7 +582,10 @@ const createStore = () => {
             },
             user(state){
                 return state.user
-            }
+            },
+            // naija(state){
+            //     return state.nigeria
+            // }
         }
     });
 };

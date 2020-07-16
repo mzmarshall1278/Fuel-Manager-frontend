@@ -22,15 +22,21 @@
             </v-btn>
             </v-card-actions>
            
-        </v-card>
+        </v-card>   
     </v-flex>
 </template>
 <script>
 export default {
-    props :['station'],
+    props :['station', 'path'],
     methods : {
     loadThis(){
-        this.$router.push('/branches/'+this.station._id+'?state='+this.station.state)
+
+        if(this.path === 'branches'){
+            this.$router.push('/'+this.path+'/'+this.station._id+'?state='+this.station.state)
+        }else{
+            this.$router.push('/'+this.path+'/?branchId='+this.station._id)
+        }
+        
     }
 }
 }

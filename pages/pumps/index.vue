@@ -4,7 +4,7 @@
         <div class="marshall--text" v-if="!pumps.length > 0">You have not added any pumps yet</div>
         <ErrorTip :text="err" v-if="err"/>
     <v-layout row wrap class="mx-auto">
-        <card v-for="pump in pumps" :key="pump._id" :number="pump.number" :pumpId="pump._id"></card>
+        <card v-for="pump in pumps" :key="pump._id" :number="pump.number" :pumpId="pump._id" :oil="pump.oil"></card>
     <OverLay :loading="loading" />
     </v-layout>
             <v-flex xs12 sm6 md4 pa-1>
@@ -12,7 +12,7 @@
                 class="mx-auto"
                 max-width="500"
                 >
-                <v-card-actions>
+                <v-card-actions v-if="user.userType === `branchManager`">
                 <v-btn large
                     text
                     color="marshall marshall"
@@ -48,6 +48,9 @@ export default {
         }
     },
     computed : {
+        user(){
+            return this.$store.getters.user
+        },
         branchId(){
            return this.$route.query.branchId
         },

@@ -1,9 +1,9 @@
 <template>
 <v-flex xs12 sm10 md8 class="ml-3">
                 <v-card class="pa-2">
-                <v-card-title class="marshall white--text">{{data._id}}</v-card-title>
+                <v-card-title class="marshall white--text">Date : {{data._id.date}}</v-card-title>
                 <v-card-text class="mt-2 marshall--text">
-                    <p>Total Pumps accounted for : {{data.pumps}}</p>
+                    <!-- <p>Total Stations accounted for : {{data.branches}}</p> -->
                     <p>Total Liters Sold  : {{data.sold}} litres</p>
                     <p>Total Ammount  : {{data.totalAmmount}} NGN</p>
                 </v-card-text>
@@ -16,9 +16,9 @@
             </v-card>
             </v-flex>   
 </template>
-<script>
+<script>    
 export default {
-    props:['data', 'branch'],
+    props:['data', 'stationId'],
   data(){
     return {
       
@@ -26,7 +26,7 @@ export default {
   },
   methods:{
       loadThis(){
-          this.$router.push('/transactions/'+this.data._id+"?branchId="+this.branch)
+          this.$router.push('/transactions/states/details/'+this.data._id.date+"?stationId="+this.stationId+"&state="+this.data._id.state)
       }
   }
 }

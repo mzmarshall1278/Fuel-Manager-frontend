@@ -2,7 +2,7 @@
             <v-flex xs12>
                 <v-card class="mx-auto"  max-width="500">
                 <v-card-title class="marshall white--text">
-                  Pump : {{pump.number}}</v-card-title>
+                  Pump : {{pump ? pump.number : "-"}}</v-card-title>
                 <v-card-text class="marshall--text pt-2">
                     <p>HeadA Started with : {{transaction.startedA}} litres</p>
                     <p>HeadB Started with : {{transaction.startedB}} litres</p>

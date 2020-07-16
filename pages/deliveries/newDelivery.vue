@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <PageTitle pageTitle = "New Delivery" class="my-3"></PageTitle>
-        <ErrorTip :text="err" v-if="err" />
+        <ErrorTip :text="err" v-if="err && err != 'Reservoir not found'" />
         <OverLay :loading="loading" />
         <v-card class="pa-10">
             <v-form @submit.prevent="submit" ref="form">
@@ -56,6 +56,9 @@
 </template>
 <script>
 export default {
+     middleware:[
+    'checkAuth',
+    'Auth'],
     data(){
         return {
             valid: true,
@@ -111,11 +114,21 @@ export default {
           //console.log(cred);
 
           return this.$store.dispatch('addDelivery', cred).then(() => {
-              if(!this.err) this.$router.push('/deliveries')
+              if(!this.err) this.$router.push('/deliveries?branchId='+this.branchId)
               this.$refs.form.reset()
           }).catch(err => console.log(err))
           
         }
+    },
+     watch:{
+        err(val){
+            if(val === 'Reservoir not found'){
+                this.$router.push('/stats/newReservoir?branchId='+this.branchId)
+         }
+        }
+    },
+    mounted(){
+        return this.$store.dispatch('getReservoir', this.branchId)
     }
 }
 </script>

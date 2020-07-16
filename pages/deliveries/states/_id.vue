@@ -1,14 +1,9 @@
 <template>
     <div class="container">
-        <pageTitle :pageTitle="'Branches : '+state"></pageTitle>
-        <ErrorTip :text="err" v-if="err" />
-        <OverLay :loading="loading"></OverLay>
-
-    <v-layout row wrap class="mx-auto my-2 ">
-        <v-btn class="marshall--text" @click="newBranch">Add Branch</v-btn>    
-    </v-layout>    
+        <pageTitle :pageTitle="'Deliveries : '+state"></pageTitle>
     <v-layout row wrap class="mx-auto">
-                <card v-for="(branch, key) in branches.result" :key="key" :station="branch" :path="'branches'" />
+                <card v-for="(branch, key) in branches.result" :key="key" :station="branch" :path="'deliveries'"/>
+                <OverLay :loading="loading"></OverLay>
     </v-layout>
 
     <div class="text-center marshall--text mt-4">
@@ -31,7 +26,7 @@ export default {
     },
     watch:{
         page(value){
-            this.changePage(value)  
+            this.changePage(value)
         }
     },
     computed:{
@@ -47,18 +42,12 @@ export default {
         },
         branches(){
             return this.$store.state.stateBranches
-        },
-        err(){
-            return this.$store.state.error
         }
 
     },
     methods: {
         changePage(value){
             return this.$store.dispatch('getStateBranches', {page:value, state:this.state, stationId: this.stationId});
-        },
-        newBranch(){
-            this.$router.push('/branches/newBranch?stationId='+this.stationId);
         }
     },
     mounted(){

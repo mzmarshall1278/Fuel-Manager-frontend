@@ -4,10 +4,11 @@
             class="mx-auto"
             max-width="500"
         >   
-        <v-card-text>
+        <v-card-text  class="marshall--text">
             <p>Pump : {{number}}</p>
+            <p>Oil : {{oil}}</p>
         </v-card-text>
-            <v-card-actions>
+            <v-card-actions v-if="user.userType === `branchManager`">
             <v-btn large
                 text
                 color="marshall marshall"
@@ -21,10 +22,13 @@
 </template>
 <script>
 export default {
-    props : ['number', 'pumpId'],
+    props : ['number', 'pumpId', 'oil'],
     computed :{
        branchId(){
            return this.$store.state.user.branchId
+       },
+       user(){
+           return this.$store.getters.user
        }
     },
     methods : {

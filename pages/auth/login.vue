@@ -48,6 +48,7 @@
 
 <script>
   export default {
+    layout: 'auth',
     data: () => ({
       valid: true,
     
@@ -92,9 +93,7 @@
             this.$router.push('/');
           })
           
-        
       },
-   
     }
   }
 </script>
